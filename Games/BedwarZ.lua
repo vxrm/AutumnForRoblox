@@ -193,44 +193,6 @@ Vertical = Flight.CreateToggle({
     ['Name'] = 'Vertical Fly',
 })
 
-local oldWs
-local speedWasEnabled = false
-Longjump = Movement:CreateModule({
-    ['Name'] = 'Longjump',
-    ['Function'] = function(callback)
-        if callback then
-            oldWs = lplr.Character.Humanoid.WalkSpeed
-            lplr.Character.Humanoid.WalkSpeed = 0
-
-            if Speed.Enabled then
-                speedWasEnabled = true
-                Speed:Toggle()
-            end
-
-            local startTick = tick()
-            local startY = 27
-            Longjump:Start(function(deltaTime)
-                local MoveDir = lplr.Character.Humanoid.MoveDirection
-                local expSpeed = (AnticheatBypass.Enabled and 75 or 23)
-
-                if (tick() - startTick) < 0.35 then
-                    lplr.Character.PrimaryPart.Velocity = Vector3.zero
-                else
-                    lplr.Character.PrimaryPart.Velocity = Vector3.new(MoveDir.X * expSpeed, startY, MoveDir.Z * expSpeed)
-                    startY -= (36 * deltaTime)
-                end
-            end)
-        else
-            lplr.Character.Humanoid.WalkSpeed = oldWs
-
-            if speedWasEnabled then
-                speedWasEnabled = false
-                Speed:Toggle()
-            end
-        end
-    end
-})
-
 Speed = Movement:CreateModule({
     ['Name'] = 'Speed',
     ['Function'] = function(callback)
@@ -264,7 +226,7 @@ Strafe = Player:CreateModule({
         if callback then
             Strafe:Start(function()
                 pcall(function()
-                    if Speed.Enabled and SpeedMode.Value == 'Velocity' then
+                    if Speed.Enabled and SpeedMode.Value == 'Velocity' or Longjump.Enabled then
                         return
                     end
 
@@ -610,6 +572,44 @@ AnticheatBypass = Exploit:CreateModule({
 
             workspace.CurrentCamera.CameraSubject = lplr.Character
             clone:Remove()
+        end
+    end
+})
+
+local oldWs
+local speedWasEnabled = false
+Longjump = Movement:CreateModule({
+    ['Name'] = 'Longjump',
+    ['Function'] = function(callback)
+        if callback then
+            oldWs = lplr.Character.Humanoid.WalkSpeed
+            lplr.Character.Humanoid.WalkSpeed = 0
+
+            if Speed.Enabled then
+                speedWasEnabled = true
+                Speed:Toggle()
+            end
+
+            local startTick = tick()
+            local startY = 26
+            Longjump:Start(function(deltaTime)
+                local MoveDir = lplr.Character.Humanoid.MoveDirection
+                local expSpeed = (AnticheatBypass.Enabled and 75 or 23)
+
+                if (tick() - startTick) < 0.25 then
+                    lplr.Character.PrimaryPart.Velocity = Vector3.zero
+                else
+                    lplr.Character.PrimaryPart.Velocity = Vector3.new(MoveDir.X * expSpeed, startY, MoveDir.Z * expSpeed)
+                    startY -= (36 * deltaTime)
+                end
+            end)
+        else
+            lplr.Character.Humanoid.WalkSpeed = oldWs
+
+            if speedWasEnabled then
+                speedWasEnabled = false
+                Speed:Toggle()
+            end
         end
     end
 })
