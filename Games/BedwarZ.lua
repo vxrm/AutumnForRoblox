@@ -239,12 +239,14 @@ Speed = Movement:CreateModule({
                 pcall(function()
                     local MoveDir = lplr.Character.Humanoid.MoveDirection
                     local Velo = lplr.Character.PrimaryPart.AssemblyLinearVelocity
-                    local Speed = (AnticheatBypass.Enabled and 75 or 23) -- lplr.Character.Humanoid.WalkSpeed
+                    local SpeedVal = (AnticheatBypass.Enabled and 75 or 23) -- lplr.Character.Humanoid.WalkSpeed
 
                     if SpeedMode.Value == 'CFrame' then
-                        lplr.Character.PrimaryPart.CFrame += (MoveDir * Speed * deltaTime)
+                        SpeedVal -= lplr.Character.Humanoid.WalkSpeed
+
+                        lplr.Character.PrimaryPart.CFrame += (MoveDir * SpeedVal * deltaTime)
                     elseif SpeedMode.Value == 'Velocity' then
-                        lplr.Character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(MoveDir.X * Speed, Velo.Y, MoveDir.Z * Speed)
+                        lplr.Character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(MoveDir.X * SpeedVal, Velo.Y, MoveDir.Z * SpeedVal)
                     end
                 end)
             end)
