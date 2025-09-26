@@ -36,6 +36,10 @@ BedwarZ = {
     end,
 }
 
+if require then
+    BedwarZ.MathUtils = require(ReplicatedStorage.Modules.MathUtils),
+end
+
 local function isAlive(plr)
     local suc, ret = pcall(function()
         return plr.Character.Humanoid.Health > 0
@@ -649,4 +653,62 @@ TSSmart = TargetStrafe.CreateToggle({
 })
 TSRotation = TargetStrafe.CreateToggle({
     ['Name'] = 'Rotate Towards Target'
+})
+
+local function getNearestBed(Range: number)
+    if workspace:FindFirstChild("BedsContainer") then
+        for i, v in workspace.BedsContainer:GetChildren() do
+            local Hitbox = v:FindFirstChild("BedHitbox")
+
+            if Hitbox then
+                local Dist = lplr:DistanceFromCharacter(hitbox.Position)
+
+                if Dist <= Range then
+                    return v, Hitbox
+                end
+            end
+        end
+    end
+    return nil
+end
+
+if not BedwarZ.MathUtils then
+    return end
+
+local function snapToGrid(ray)
+    if not ray then return Vector3.zero end
+    return mathUtils.Snap(ray.Position - ray.Normal * 1.5, 3)
+end
+
+local rayParamsBreaker = RaycastParams.new()
+rayParamsBreaker.FilterDescendantsInstances = {workspace.BedsContainer}
+rayParamsBreaker.FilterType = Enum.RaycastFilterType.Include
+Breaker = World:CreateModule({
+    ["Name"] = "Breaker",
+    ["Function"] = function(callback)
+        if callback then
+            Breaker:Start(function()
+                local Bed, Dist = getNearestBed(30)
+                local Item = getItem("pickaxe") or getHoldingItem("pickaxe")
+
+                if Bed and Item and lplr.Character and lplr.Character.PrimaryPart then
+                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(Bed.Position)
+                    local vpoint = workspace.CurrentCamera:ViewportPointToRay(screenPos.X, screenPos.Y)
+                    local ray = workspace:Raycast(vpoint.Origin, vpoint.Direction * 18, rayParamsBreaker)
+                    local blockPos = snapToGrid(ray)
+
+                    local fakeOrigin = blockPos + Vector3.new(0, 3, 0)
+                    local fakeDirection = (blockPos - fakeOrigin).Unit
+
+                    BedwarZ.MineBlock:FireServer(
+                        Item.Name,
+                        Bed.Parent,
+                        blockPos,
+                        fakeOrigin,
+                        fakeDirection
+                    )
+                end
+            end)
+        end
+    end
 })
