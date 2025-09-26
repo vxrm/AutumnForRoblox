@@ -333,7 +333,7 @@ local HUD = Visuals:CreateModule({
     ['Name'] = 'HUD',
     ['Function'] = function(callback)
         for i,v in HUDItems do
-            v.Visible = false
+            v.Visible = callback
         end
     end
 })
@@ -566,7 +566,7 @@ local function modifyCharacter(character)
             if not isnetworkowner(character.PrimaryPart) then
                 clone.PrimaryPart.CFrame = character.PrimaryPart.CFrame
             else
-                if (tick() - lastTP) > 0.125 then
+                if (tick() - lastTP) > 0.135 then
                    character.PrimaryPart.CFrame = clone.PrimaryPart.CFrame
                    lastTP = tick()
                 end
