@@ -661,7 +661,7 @@ local function getNearestBed(Range: number)
             local Hitbox = v:FindFirstChild("BedHitbox")
 
             if Hitbox then
-                local Dist = lplr:DistanceFromCharacter(hitbox.Position)
+                local Dist = lplr:DistanceFromCharacter(Hitbox.Position)
 
                 if Dist <= Range then
                     return v, Hitbox
