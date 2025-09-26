@@ -170,37 +170,24 @@ Flight = Movement:CreateModule({
     ['Name'] = 'Flight',
     ['Function'] = function(callback)
         if callback then
-            local setY = lplr.Character.PrimaryPart.CFrame.Y
             Flight:Start(function(deltaTime: number)
                 if isAlive(lplr) then
                     local Velo = lplr.Character.PrimaryPart.Velocity
-                    local CFr = lplr.Character.PrimaryPart.CFrame
-                    
-                    if FlightMode.Value == 'Velocity' then
-                        setY = 0.8 + deltaTime
-                    end
+                    local setY = 0.8 + deltaTime
 
                     if Vertical.Enabled then
                         if UserInputService:IsKeyDown('Space') then
-                            setY += 50 * (FlightMode.Value == 'CFrame' and deltaTime or 1)
+                            setY += 50
                         elseif UserInputService:IsKeyDown('LeftShift') then
-                            setY -= 50 * (FlightMode.Value == 'CFrame' and deltaTime or 1)
+                            setY -= 50
                         end
                     end
 
-                    if FlightMode.Value == 'Velocity' then
-                        lplr.Character.PrimaryPart.Velocity = Vector3.new(Velo.X, setY, Velo.Z)
-                    elseif FlightMode.Value == 'CFrame' then
-                        lplr.Character.PrimaryPart.CFrame = CFrame.new(CFr.X, setY, CFr.Z)
-                    end
+                    lplr.Character.PrimaryPart.Velocity = Vector3.new(Velo.X, setY, Velo.Z)
                 end
             end)
         end
     end
-})
-FlightMode = Flight.CreatePicker({
-    ['Name'] = 'Method',
-    ['Options'] = {'Velocity', 'CFrame'}
 })
 Vertical = Flight.CreateToggle({
     ['Name'] = 'Vertical Fly',
@@ -221,10 +208,10 @@ Longjump = Movement:CreateModule({
             end
 
             local startTick = tick()
-            local startY = 26
+            local startY = 27
             Longjump:Start(function(deltaTime)
                 local MoveDir = lplr.Character.Humanoid.MoveDirection
-                local expSpeed = (AnticheatBypass.Enabled and 70 or (Strafe.Enabled and lplr.Character.Humanoid.WalkSpeed or 23))
+                local expSpeed = (AnticheatBypass.Enabled and 75 or 23)
 
                 if (tick() - startTick) < 0.35 then
                     lplr.Character.PrimaryPart.Velocity = Vector3.zero
@@ -252,14 +239,12 @@ Speed = Movement:CreateModule({
                 pcall(function()
                     local MoveDir = lplr.Character.Humanoid.MoveDirection
                     local Velo = lplr.Character.PrimaryPart.AssemblyLinearVelocity
-                    local SpeedVal = (AnticheatBypass.Enabled and 70 or 23)
+                    local Speed = (AnticheatBypass.Enabled and 75 or 23) -- lplr.Character.Humanoid.WalkSpeed
 
                     if SpeedMode.Value == 'CFrame' then
-                        SpeedVal -= lplr.Character.Humanoid.WalkSpeed
-
-                        lplr.Character.PrimaryPart.CFrame += (MoveDir * SpeedVal * deltaTime)
+                        lplr.Character.PrimaryPart.CFrame += (MoveDir * Speed * deltaTime)
                     elseif SpeedMode.Value == 'Velocity' then
-                        lplr.Character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(MoveDir.X * SpeedVal, Velo.Y, MoveDir.Z * SpeedVal)
+                        lplr.Character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(MoveDir.X * Speed, Velo.Y, MoveDir.Z * Speed)
                     end
                 end)
             end)
@@ -544,7 +529,7 @@ local function createClone()
         end
     end
 
-    oldChar.PrimaryPart.Transparency = 0.5
+    oldChar.PrimaryPart.Transparency = 1
     oldChar.Head.face.Transparency = 1
     return clone, oldChar
 end
@@ -576,18 +561,16 @@ local function modifyCharacter(character)
             if not character or character:FindFirstChild('PrimaryPart') then
                 return end
             
-            pcall(function()
-                if not isnetworkowner(character.PrimaryPart) then
-                    clone.PrimaryPart.CFrame = character.PrimaryPart.CFrame
-                else
-                    if (tick() - lastTP) > 0.13 then
-                        character.PrimaryPart.CFrame = clone.PrimaryPart.CFrame
-                        lastTP = tick()
-                    end
-
-                    character.PrimaryPart.Velocity = Vector3.new(0, clone.PrimaryPart.Velocity.Y, 0)
+            if not isnetworkowner(character.PrimaryPart) then
+                clone.PrimaryPart.CFrame = character.PrimaryPart.CFrame
+            else
+                if (tick() - lastTP) > 0.135 then
+                   character.PrimaryPart.CFrame = clone.PrimaryPart.CFrame
+                   lastTP = tick()
                 end
-            end)
+
+                character.PrimaryPart.Velocity = Vector3.new(0, clone.PrimaryPart.Velocity.Y, 0)
+            end
         end))
     end
 end
@@ -678,13 +661,15 @@ local function getNearestBed(Range: number)
             local Hitbox = v:FindFirstChild("BedHitbox")
 
             if Hitbox then
-                local Dist = lplr:DistanceFromCharacter(Hitbox.Position)
+                local Dist = lplr:DistanceFromCharacter(hitbox.Position)
+
                 if Dist <= Range then
-                    return Hitbox, Dist
+                    return v, Hitbox
                 end
             end
         end
     end
+    return nil
 end
 
 if not BedwarZ.MathUtils then
@@ -703,7 +688,7 @@ Breaker = World:CreateModule({
     ["Function"] = function(callback)
         if callback then
             Breaker:Start(function()
-                local Bed = getNearestBed(30)
+                local Bed, Dist = getNearestBed(30)
                 local Item = getItem("pickaxe") or getHoldingItem("pickaxe")
 
                 if Bed and Item and lplr.Character and lplr.Character.PrimaryPart then
