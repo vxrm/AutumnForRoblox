@@ -137,7 +137,7 @@ Aura = Combat:CreateModule({
                         AuraBoxInst.CFrame = Entity.root.CFrame
                         TweenService:Create(AuraBoxInst, TweenInfo.new(0.25), {Size = Entity.root.Size * 2.5}):Play()
 
-                        if Sword and (TimedHits.Enabled and (tick() - lastAttacked) > 0.05 or true) then
+                        if Sword and (TimedHits.Enabled and (tick() - lastAttacked) > 0.1 or true) then
                             loadAnim:Stop()
                             loadAnim:Play()
 
