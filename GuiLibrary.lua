@@ -15,7 +15,7 @@ function GuiLibrary.Initialize()
 	shared.AutumnLoaded = true;
 	
 	local ScreenGui = Instance.new('ScreenGui')
-	ScreenGui.Parent = game:GetService('Players').LocalPlayer.PlayerGui
+	ScreenGui.Parent = game:GetService('CoreGui')
 	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.ResetOnSpawn = false
 	local ArrayFrame = Instance.new('Frame')
