@@ -262,7 +262,7 @@ Strafe = Player:CreateModule({
         if callback then
             Strafe:Start(function()
                 pcall(function()
-                    if Speed.Enabled then
+                    if Speed.Enabled and SpeedMode.Value == 'Velocity' then
                         return
                     end
 
@@ -564,7 +564,7 @@ local function modifyCharacter(character)
             if not isnetworkowner(character.PrimaryPart) then
                 clone.PrimaryPart.CFrame = character.PrimaryPart.CFrame
             else
-                if (tick() - lastTP) > 0.135 then
+                if (tick() - lastTP) > 0.125 then
                    character.PrimaryPart.CFrame = clone.PrimaryPart.CFrame
                    lastTP = tick()
                 end
@@ -661,7 +661,7 @@ local function getNearestBed(Range: number)
             local Hitbox = v:FindFirstChild("BedHitbox")
 
             if Hitbox then
-                local Dist = lplr:DistanceFromCharacter(hitbox.Position)
+                local Dist = lplr:DistanceFromCharacter(Hitbox.Position)
 
                 if Dist <= Range then
                     return v, Hitbox
@@ -688,7 +688,7 @@ Breaker = World:CreateModule({
     ["Function"] = function(callback)
         if callback then
             Breaker:Start(function()
-                local Bed, Dist = getNearestBed(30)
+                local Bed = getNearestBed(30)
                 local Item = getItem("pickaxe") or getHoldingItem("pickaxe")
 
                 if Bed and Item and lplr.Character and lplr.Character.PrimaryPart then
