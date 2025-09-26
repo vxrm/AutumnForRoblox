@@ -3,6 +3,7 @@ local GuiLibrary = shared.GuiLibrary
 local Players = game:GetService('Players')
 local RunService = game:GetService('RunService')
 local TweenService = game:GetService('TweenService')
+local TextChatService = game:GetService('TextChatService')
 local UserInputService = game:GetService('UserInputService')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 
@@ -37,7 +38,7 @@ BedwarZ = {
 }
 
 if require then
-    BedwarZ.MathUtils = require(ReplicatedStorage.Modules.MathUtils),
+    BedwarZ.MathUtils = require(ReplicatedStorage.Modules.MathUtils)
 end
 
 local function isAlive(plr)
@@ -353,16 +354,16 @@ HUD.CreateToggle({
             Item.BorderSizePixel = 0
             Item.Name = 'Session Info'
             local Sort = Instance.new('UIListLayout')
-            Sort.Parent = infoThingy
+            Sort.Parent = Item
             Sort.SortOrder = Enum.SortOrder.LayoutOrder
             local TopFrame = Instance.new('Frame')
-            TopFrame.Parent = infoThingy
+            TopFrame.Parent = Item
             TopFrame.Position = UDim2.fromOffset(0, -5)
             TopFrame.Size = UDim2.new(1, 0, 0, 5)
             TopFrame.BorderSizePixel = 0
             TopFrame.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
             local TopMiddle = Instance.new('TextLabel')
-            TopMiddle.Parent = infoThingy
+            TopMiddle.Parent = Item
             TopMiddle.Size = UDim2.fromScale(1, 0.2)
             TopMiddle.Position = UDim2.fromScale(0.5, 0)
             TopMiddle.AnchorPoint = Vector2.new(0.5, 0)
@@ -371,7 +372,7 @@ HUD.CreateToggle({
             TopMiddle.TextSize = 10
             TopMiddle.Text = 'Session Info'
             local KillsText = Instance.new('TextLabel')
-            KillsText.Parent = infoThingy
+            KillsText.Parent = Item
             KillsText.Size = UDim2.fromScale(1, 0.2)
             KillsText.BackgroundTransparency = 1
             KillsText.TextXAlignment = Enum.TextXAlignment.Left
@@ -379,7 +380,7 @@ HUD.CreateToggle({
             KillsText.TextSize = 9
             KillsText.Text = '  Kills: 0'
             local WinsText = Instance.new('TextLabel')
-            WinsText.Parent = infoThingy
+            WinsText.Parent = Item
             WinsText.Size = UDim2.fromScale(1, 0.2)
             WinsText.BackgroundTransparency = 1
             WinsText.TextXAlignment = Enum.TextXAlignment.Left
@@ -387,7 +388,7 @@ HUD.CreateToggle({
             WinsText.TextSize = 9
             WinsText.Text = '  Wins: 0'
             local BedsText = Instance.new('TextLabel')
-            BedsText.Parent = infoThingy
+            BedsText.Parent = Item
             BedsText.Size = UDim2.fromScale(1, 0.2)
             BedsText.BackgroundTransparency = 1
             BedsText.TextXAlignment = Enum.TextXAlignment.Left
@@ -456,7 +457,6 @@ local function sendMessage(msg: string)
     TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync(msg)
 end
 
-local TextChatService = game:GetService('TextChatService')
 local ATItems = {}
 AutoToxic = Player:CreateModule({
     ['Name'] = 'AutoToxic',
@@ -626,7 +626,7 @@ TargetStrafe = Combat:CreateModule({
                     local X = math.cos(Angle) * 5
                     local Z = math.sin(Angle) * 5
 
-                    local expPos = v.root.Position + Vector3.new(X, 0, Z)
+                    local expPos = Nearest.root.Position + Vector3.new(X, 0, Z)
 
                     if TSSmart.Enabled then
                         local ray = workspace:Raycast(expPos, Vector3.new(0, -10, 0))
@@ -634,14 +634,14 @@ TargetStrafe = Combat:CreateModule({
                         if ray then
                             lplr.Character.PrimaryPart.CFrame = CFrame.new(expPos)
                         else
-                            lplr.Character.PrimaryPart.CFrame = v.root.CFrame
+                            lplr.Character.PrimaryPart.CFrame = Nearest.root.CFrame
                         end
                     else
                         lplr.Character.PrimaryPart.CFrame = expPos
                     end
 
                     if TSRotation.Enabled then
-                        lplr.Character.PrimaryPart.CFrame = CFrame.lookAt(lplr.Character.PrimaryPart.Position, Vector3.new(v.root.Position.X, lplr.Character.PrimaryPart.CFrame.Y, v.root.Position.Z))
+                        lplr.Character.PrimaryPart.CFrame = CFrame.lookAt(lplr.Character.PrimaryPart.Position, Vector3.new(Nearest.root.Position.X, lplr.Character.PrimaryPart.CFrame.Y, Nearest.root.Position.Z))
                     end
                 end
             end)
@@ -661,7 +661,7 @@ local function getNearestBed(Range: number)
             local Hitbox = v:FindFirstChild("BedHitbox")
 
             if Hitbox then
-                local Dist = lplr:DistanceFromCharacter(Hitbox.Position)
+                local Dist = lplr:DistanceFromCharacter(hitbox.Position)
 
                 if Dist <= Range then
                     return v, Hitbox
@@ -677,7 +677,7 @@ if not BedwarZ.MathUtils then
 
 local function snapToGrid(ray)
     if not ray then return Vector3.zero end
-    return mathUtils.Snap(ray.Position - ray.Normal * 1.5, 3)
+    return BedwarZ.MathUtils.Snap(ray.Position - ray.Normal * 1.5, 3)
 end
 
 local rayParamsBreaker = RaycastParams.new()
