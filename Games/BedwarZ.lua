@@ -688,11 +688,11 @@ Breaker = World:CreateModule({
     ["Function"] = function(callback)
         if callback then
             Breaker:Start(function()
-                local Bed = getNearestBed(30)
+                local Bed, Hitbox = getNearestBed(30)
                 local Item = getItem("pickaxe") or getHoldingItem("pickaxe")
 
                 if Bed and Item and lplr.Character and lplr.Character.PrimaryPart then
-                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(Bed.Position)
+                    local screenPos = workspace.CurrentCamera:WorldToViewportPoint(Hitbox.Position)
                     local vpoint = workspace.CurrentCamera:ViewportPointToRay(screenPos.X, screenPos.Y)
                     local ray = workspace:Raycast(vpoint.Origin, vpoint.Direction * 18, rayParamsBreaker)
                     local blockPos = snapToGrid(ray)
