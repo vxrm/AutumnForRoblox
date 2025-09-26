@@ -39,7 +39,7 @@ local Games = {
 	['BedwarZ'] = {71480482338212},
 }
 
-loadfile('AutumnV3/Games/Universal.lua')()
+--loadfile('AutumnV3/Games/Universal.lua')()
 for gName, v in Games do
     for _, id in v do
         if game.PlaceId == id then
