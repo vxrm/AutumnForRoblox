@@ -1,3 +1,8 @@
+if shared.Restart then
+	shared.Restart = false
+	delfile('AutumnV3')
+end
+
 if not isfolder('AutumnV3') then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/AutumnV3/AutumnForRoblox/refs/heads/main/Installer.lua'))()
 end
